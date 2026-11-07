@@ -1,6 +1,7 @@
 import Toybox.Activity;
 import Toybox.ActivityMonitor;
 import Toybox.Application;
+import Toybox.Complications;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
@@ -291,14 +292,31 @@ class ReticuleView extends WatchUi.WatchFace {
         return null;
     }
 
-    // Asks for exactly one sample: short Duration periods can crash on this API.
+    // The watch's own Body Battery complication first: it is the value Garmin shows.
+    // Otherwise the newest non-empty history sample, as the very last one is often
+    // still empty on a real watch. Asks for a count of samples, never a Duration:
+    // short Duration periods can crash on this API.
     hidden function getBodyBattery() {
+        if ((Toybox has :Complications) && (Complications has :getComplication)) {
+            try {
+                var complication = Complications.getComplication(
+                    new Complications.Id(Complications.COMPLICATION_TYPE_BODY_BATTERY));
+                var value = complication.value;
+                if (value instanceof Number) {
+                    return value;
+                }
+            } catch (e) {
+            }
+        }
         if ((Toybox has :SensorHistory) && (Toybox.SensorHistory has :getBodyBatteryHistory)) {
-            var history = Toybox.SensorHistory.getBodyBatteryHistory({:period => 1});
+            var history = Toybox.SensorHistory.getBodyBatteryHistory({:period => 10});
             if (history != null) {
                 var sample = history.next();
-                if (sample != null && sample.data != null) {
-                    return sample.data.toNumber();
+                while (sample != null) {
+                    if (sample.data != null) {
+                        return sample.data.toNumber();
+                    }
+                    sample = history.next();
                 }
             }
         }
