@@ -213,7 +213,14 @@ class ReticuleView extends WatchUi.WatchFace {
         }
         if (location != null) {
             // Saved only when it moves by about 5 km, to spare the flash memory.
+            // The stored copy is read back first, so a restart does not rewrite it.
             var degrees = location.toDegrees();
+            if (_savedDegrees == null) {
+                var stored = Application.Storage.getValue("location");
+                if (stored instanceof Array && stored.size() == 2) {
+                    _savedDegrees = stored as Array<Double>;
+                }
+            }
             var saved = _savedDegrees;
             if (saved == null || farApart(saved[0], degrees[0]) || farApart(saved[1], degrees[1])) {
                 Application.Storage.setValue("location", degrees);
