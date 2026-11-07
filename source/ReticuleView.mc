@@ -76,13 +76,13 @@ class ReticuleView extends WatchUi.WatchFace {
     const SKY_WIND = 7;
 
     // Seven segments, bit order: a b c d e f g
-    hidden var _segments = [0x7E, 0x30, 0x6D, 0x79, 0x33, 0x5B, 0x5F, 0x70, 0x7F, 0x7B];
+    hidden var _segments as Array<Number> = [0x7E, 0x30, 0x6D, 0x79, 0x33, 0x5B, 0x5F, 0x70, 0x7F, 0x7B];
 
-    hidden var _days = ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"];
-    hidden var _months = ["JAN", "FÉV", "MAR", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEP", "OCT", "NOV", "DÉC"];
+    hidden var _days as Array<String> = ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"];
+    hidden var _months as Array<String> = ["JAN", "FÉV", "MAR", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEP", "OCT", "NOV", "DÉC"];
 
     // Weather.CONDITION_* (0 to 53) mapped to a sky kind
-    hidden var _skyKinds = [
+    hidden var _skyKinds as Array<Number> = [
         0, 1, 2, 3, 4, 7, 5, 4, 6, 6,
         4, 3, 5, 3, 3, 3, 4, 4, 4, 4,
         2, 4, 1, 0, 3, 3, 3, 3, 5, 6,
@@ -92,8 +92,8 @@ class ReticuleView extends WatchUi.WatchFace {
     ];
 
     // Always-on drift. Each step moves both axes by at least the stroke width.
-    hidden var _driftX = [-8, 0, 8, -4, 4];
-    hidden var _driftY = [-4, 8, 0, 4, -8];
+    hidden var _driftX as Array<Number> = [-8, 0, 8, -4, 4];
+    hidden var _driftY as Array<Number> = [-4, 8, 0, 4, -8];
 
     hidden var _lowPower = false;
     hidden var _burnIn = false;
@@ -105,7 +105,7 @@ class ReticuleView extends WatchUi.WatchFace {
     hidden var _sunTime = null;
     hidden var _sunRising = false;
     hidden var _night = false;
-    hidden var _savedDegrees = null;
+    hidden var _savedDegrees as Array<Double>? = null;
 
     hidden var _fontValue;
     hidden var _fontUnit;
@@ -256,7 +256,7 @@ class ReticuleView extends WatchUi.WatchFace {
     }
 
     // Watches report 0,0 or 180,180 when they have no real fix.
-    hidden function validLocation(location) {
+    hidden function validLocation(location as Position.Location?) as Position.Location? {
         if (location == null) {
             return null;
         }
